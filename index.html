@@ -3,25 +3,18 @@
 <head>
   <title>Ludo Shardex</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="animations.css">
 </head>
 <body>
 
-<h1 class="logo">🎲 Ludo Shardex</h1>
-
-<div class="coins">Coins: <span id="coins">1000</span> 💰</div>
+<h1>🎲 Ludo Shardex</h1>
 
 <div class="board" id="board"></div>
 
 <div class="controls">
-  <div class="dice" id="dice">🎲</div>
-  <button onclick="rollDice()">Roll</button>
+  <div id="dice">🎲</div>
+  <button onclick="rollDice()">Roll Dice</button>
   <h3 id="turn">Your Turn</h3>
 </div>
-
-<audio id="diceSound" src="sounds/dice.mp3"></audio>
-<audio id="moveSound" src="sounds/move.mp3"></audio>
-<audio id="winSound" src="sounds/win.mp3"></audio>
 
 <script src="script.js"></script>
 </body>
