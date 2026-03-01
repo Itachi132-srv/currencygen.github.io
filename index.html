@@ -1,52 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Reward Portal</title>
+  <title>Demo Formtion</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body{
       margin:0;
-      font-family:'Segoe UI',sans-serif;
+      font-family:Segoe UI,sans-serif;
       background:linear-gradient(135deg,#0f0f0f,#1a1a1a);
-      color:white;
       display:flex;
       justify-content:center;
       align-items:center;
       height:100vh;
+      color:white;
     }
-
     .card{
       background:#141414;
-      padding:35px;
+      padding:30px;
       width:360px;
       border-radius:15px;
       box-shadow:0 0 25px rgba(255,140,0,0.4);
       text-align:center;
-      animation:fadeIn 0.5s ease-in-out;
     }
-
-    h2{ color:#ff8c00; margin-bottom:15px; }
-
-    button{
-      background:#ff8c00;
-      border:none;
-      padding:10px 20px;
-      margin:8px;
-      border-radius:8px;
-      color:white;
-      font-weight:bold;
-      cursor:pointer;
-      transition:0.3s;
-    }
-
-    button:hover{
-      background:#ff6a00;
-      transform:scale(1.05);
-      box-shadow:0 0 15px #ff8c00;
-    }
-
+    h2{ color:#ff8c00; }
     input{
-      width:92%;
+      width:95%;
       padding:10px;
       margin:6px 0;
       border-radius:8px;
@@ -55,84 +33,92 @@
       color:white;
       outline:none;
     }
-
-    .hidden{ display:none; }
-
-    .success{
-      color:lime;
-      font-size:20px;
+    button{
+      background:#ff8c00;
+      border:none;
+      padding:10px 20px;
       margin-top:10px;
+      border-radius:8px;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      opacity:0.5;
     }
-
-    @keyframes fadeIn{
-      from{opacity:0; transform:translateY(15px);}
-      to{opacity:1; transform:translateY(0);}
+    button.enabled{
+      opacity:1;
+      cursor:pointer;
     }
+    .error{ color:red; font-size:14px; }
+    .success{ color:lime; }
+    .hidden{ display:none; }
   </style>
 </head>
 <body>
 
-<div class="card" id="page1">
-  <h2>Select Reward Type</h2>
-  <button onclick="nextPage('Owo')">Owo</button>
-  <button onclick="nextPage('LiteCoin')">LiteCoin</button>
-</div>
+<div class="card">
+  <h2>Demo Form</h2>
+  <p style="font-size:12px;color:#aaa;">(Educational Demo Only)</p>
 
-<div class="card hidden" id="page2">
-  <h2 id="typeTitle"></h2>
-  <input type="text" id="username" placeholder="Enter Username">
-  <input type="text" id="accountName" placeholder="Enter Acc Email">
-  <input type="text" id="serverName" placeholder="Enter Acc Password">
-  <input type="number" id="amount" placeholder="Enter Amount">
-  <button onclick="generateCode()">Generate Code</button>
-  <p id="generatedCode"></p>
-  <button id="copyBtn" class="hidden" onclick="copyCode()">Copy Code</button>
-  <button id="nextBtn" class="hidden" onclick="showVerify()">Next</button>
-</div>
+  <input type="text" id="username" placeholder="Username" oninput="validateForm()">
+  <input type="email" id="email" placeholder="Email" oninput="validateForm()">
+  <input type="text" id="server" placeholder="Password" oninput="validateForm()">
 
-<div class="card hidden" id="page3">
-  <h2>Enter Code</h2>
-  <input type="text" id="verifyInput" placeholder="Enter Code">
-  <button onclick="verifyCode()">Submit</button>
-  <p id="result"></p>
+  <p id="emailError" class="error hidden">Invalid email format</p>
+
+  <button id="generateBtn" onclick="generateCode()" disabled>Generate Code</button>
+
+  <p id="codeBox"></p>
+
+  <div id="verifySection" class="hidden">
+    <input type="text" id="verifyInput" placeholder="Enter Code">
+    <button onclick="verifyCode()">Submit</button>
+    <p id="result"></p>
+  </div>
 </div>
 
 <script>
 let currentCode="";
 
-function nextPage(type){
-  document.getElementById("page1").classList.add("hidden");
-  document.getElementById("page2").classList.remove("hidden");
-  document.getElementById("typeTitle").innerText=type+" Generator";
+function validateForm(){
+  const username=document.getElementById("username").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const server=document.getElementById("server").value.trim();
+  const emailError=document.getElementById("emailError");
+  const btn=document.getElementById("generateBtn");
+
+  const emailPattern=/^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+  if(email && !emailPattern.test(email)){
+    emailError.classList.remove("hidden");
+  } else {
+    emailError.classList.add("hidden");
+  }
+
+  if(username && server && emailPattern.test(email)){
+    btn.disabled=false;
+    btn.classList.add("enabled");
+  } else {
+    btn.disabled=true;
+    btn.classList.remove("enabled");
+  }
 }
 
 function generateCode(){
   const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   currentCode="";
-  for(let i=0;i<7;i++){
+  for(let i=0;i<6;i++){
     currentCode+=chars.charAt(Math.floor(Math.random()*chars.length));
   }
-  document.getElementById("generatedCode").innerHTML="Generated Code: <b>"+currentCode+"</b>";
-  document.getElementById("copyBtn").classList.remove("hidden");
-  document.getElementById("nextBtn").classList.remove("hidden");
-}
-
-function copyCode(){
-  navigator.clipboard.writeText(currentCode);
-  alert("Code Copied!");
-}
-
-function showVerify(){
-  document.getElementById("page2").classList.add("hidden");
-  document.getElementById("page3").classList.remove("hidden");
+  document.getElementById("codeBox").innerHTML="Generated Code: <b>"+currentCode+"</b>";
+  document.getElementById("verifySection").classList.remove("hidden");
 }
 
 function verifyCode(){
   const input=document.getElementById("verifyInput").value;
   if(input===currentCode){
-    document.getElementById("result").innerHTML="✔ <span class='success'>Send Successful</span>";
+    document.getElementById("result").innerHTML="<span class='success'>✔ Success</span>";
   }else{
-    document.getElementById("result").innerHTML="✖ Wrong Code";
+    document.getElementById("result").innerHTML="<span class='error'>✖ Invalid Code</span>";
   }
 }
 </script>
