@@ -1,77 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Reward Generator</title>
+  <title>Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial; text-align: center; background:#111; color:white; padding-top:50px; }
-    button { padding:10px 20px; margin:10px; font-size:18px; cursor:pointer; }
-    input { padding:8px; margin:5px; }
-    .hidden { display:none; }
-    .success { color:lime; font-size:22px; }
+    body{
+      margin:0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg,#0f0f0f,#1a1a1a);
+      color:white;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+
+    .card{
+      background:#141414;
+      padding:40px;
+      width:350px;
+      border-radius:15px;
+      box-shadow:0 0 25px rgba(255,140,0,0.4);
+      text-align:center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    h2{
+      color:#ff8c00;
+      margin-bottom:20px;
+    }
+
+    button{
+      background:#ff8c00;
+      border:none;
+      padding:10px 20px;
+      margin:8px;
+      border-radius:8px;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button:hover{
+      background:#ff6a00;
+      transform:scale(1.05);
+      box-shadow:0 0 15px #ff8c00;
+    }
+
+    input{
+      width:90%;
+      padding:10px;
+      margin:8px 0;
+      border-radius:8px;
+      border:1px solid #ff8c00;
+      background:#1f1f1f;
+      color:white;
+      outline:none;
+    }
+
+    .hidden{ display:none; }
+
+    .success{
+      color:lime;
+      font-size:20px;
+      margin-top:10px;
+    }
+
+    @keyframes fadeIn{
+      from{opacity:0; transform:translateY(20px);}
+      to{opacity:1; transform:translateY(0);}
+    }
   </style>
 </head>
 <body>
 
-<div id="page1">
+<div class="card" id="page1">
   <h2>Select Reward Type</h2>
   <button onclick="nextPage('MoonCoin')">Owo</button>
   <button onclick="nextPage('StarToken')">LiteCoin</button>
 </div>
 
-<div id="page2" class="hidden">
+<div class="card hidden" id="page2">
   <h2 id="typeTitle"></h2>
-  <input type="text" id="username" placeholder="Enter Username"><br>
-  <input type="number" id="amount" placeholder="Enter Amount"><br>
+  <input type="text" id="username" placeholder="Enter Username">
+  <input type="number" id="amount" placeholder="Enter Amount">
   <button onclick="generateCode()">Generate Code</button>
   <p id="generatedCode"></p>
   <button id="copyBtn" class="hidden" onclick="copyCode()">Copy Code</button>
-  <br><br>
-  <button id="goNext" class="hidden" onclick="showVerify()">Next</button>
+  <button id="nextBtn" class="hidden" onclick="showVerify()">Next</button>
 </div>
 
-<div id="page3" class="hidden">
+<div class="card hidden" id="page3">
   <h2>Enter Code</h2>
-  <input type="text" id="verifyInput" placeholder="Enter Code"><br>
+  <input type="text" id="verifyInput" placeholder="Enter Code">
   <button onclick="verifyCode()">Submit</button>
   <p id="result"></p>
 </div>
 
 <script>
-let currentCode = "";
+let currentCode="";
 
 function nextPage(type){
-  document.getElementById("page1").style.display="none";
-  document.getElementById("page2").style.display="block";
+  document.getElementById("page1").classList.add("hidden");
+  document.getElementById("page2").classList.remove("hidden");
   document.getElementById("typeTitle").innerText = type + " Generator";
 }
 
 function generateCode(){
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   currentCode="";
-  for(let i=0;i<6;i++){
-    currentCode += chars.charAt(Math.floor(Math.random()*chars.length));
+  for(let i=0;i<7;i++){
+    currentCode+=chars.charAt(Math.floor(Math.random()*chars.length));
   }
-  document.getElementById("generatedCode").innerText = "Code: " + currentCode;
+  document.getElementById("generatedCode").innerHTML="Generated Code: <b>"+currentCode+"</b>";
   document.getElementById("copyBtn").classList.remove("hidden");
-  document.getElementById("goNext").classList.remove("hidden");
+  document.getElementById("nextBtn").classList.remove("hidden");
 }
 
 function copyCode(){
   navigator.clipboard.writeText(currentCode);
-  alert("Code copied!");
+  alert("Code Copied!");
 }
 
 function showVerify(){
-  document.getElementById("page2").style.display="none";
-  document.getElementById("page3").style.display="block";
+  document.getElementById("page2").classList.add("hidden");
+  document.getElementById("page3").classList.remove("hidden");
 }
 
 function verifyCode(){
-  const input = document.getElementById("verifyInput").value;
-  if(input === currentCode){
-    document.getElementById("result").innerHTML = "✅ <span class='success'>Send Successful</span>";
-  } else {
-    document.getElementById("result").innerHTML = "❌ Wrong Code";
+  const input=document.getElementById("verifyInput").value;
+  if(input===currentCode){
+    document.getElementById("result").innerHTML="✔ <span class='success'>Send Successful</span>";
+  }else{
+    document.getElementById("result").innerHTML="✖ Wrong Code";
   }
 }
 </script>
