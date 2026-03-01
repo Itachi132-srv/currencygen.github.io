@@ -1,159 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>3D Cart Racing Mobile</title>
-<style>
-body { margin: 0; overflow: hidden; background: #111; }
-canvas { display: block; }
-.controls {
-    position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px;
-}
-.btn {
-    width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; user-select: none;
-}
-.ui {
-    position: absolute; top: 10px; left: 10px; color: white; font-size: 18px; font-weight: bold;
-}
-</style>
+  <title>Reward Generator</title>
+  <style>
+    body { font-family: Arial; text-align: center; background:#111; color:white; padding-top:50px; }
+    button { padding:10px 20px; margin:10px; font-size:18px; cursor:pointer; }
+    input { padding:8px; margin:5px; }
+    .hidden { display:none; }
+    .success { color:lime; font-size:22px; }
+  </style>
 </head>
 <body>
-<div class="ui">Speed: <span id="speed">0</span> | Coins: <span id="coins">0</span></div>
-<div class="controls">
-    <div class="btn" id="left">⬅</div>
-    <div class="btn" id="boost">⚡</div>
-    <div class="btn" id="right">➡</div>
+
+<div id="page1">
+  <h2>Select Reward Type</h2>
+  <button onclick="nextPage('MoonCoin')">Owo</button>
+  <button onclick="nextPage('StarToken')">LiteCoin</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+<div id="page2" class="hidden">
+  <h2 id="typeTitle"></h2>
+  <input type="text" id="username" placeholder="Enter Username"><br>
+  <input type="number" id="amount" placeholder="Enter Amount"><br>
+  <button onclick="generateCode()">Generate Code</button>
+  <p id="generatedCode"></p>
+  <button id="copyBtn" class="hidden" onclick="copyCode()">Copy Code</button>
+  <br><br>
+  <button id="goNext" class="hidden" onclick="showVerify()">Next</button>
+</div>
+
+<div id="page3" class="hidden">
+  <h2>Enter Code</h2>
+  <input type="text" id="verifyInput" placeholder="Enter Code"><br>
+  <button onclick="verifyCode()">Submit</button>
+  <p id="result"></p>
+</div>
+
 <script>
-let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-let renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+let currentCode = "";
 
-// Road
-let roadGeometry = new THREE.PlaneGeometry(4, 200);
-let roadMaterial = new THREE.MeshStandardMaterial({color: 0x333333});
-let road = new THREE.Mesh(roadGeometry, roadMaterial);
-road.rotation.x = -Math.PI/2;
-scene.add(road);
-
-// Cart
-let cartGeometry = new THREE.BoxGeometry(1,0.5,2);
-let cartMaterial = new THREE.MeshStandardMaterial({color: 0xff0000});
-let cart = new THREE.Mesh(cartGeometry, cartMaterial);
-cart.position.y = 0.25;
-cart.position.z = -8;
-scene.add(cart);
-
-// Lights
-let ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-scene.add(ambientLight);
-let directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(5,10,5);
-scene.add(directionalLight);
-
-// Obstacles
-let obstacles = [];
-function spawnObstacle() {
-    let obsGeometry = new THREE.BoxGeometry(1,1,1);
-    let obsMaterial = new THREE.MeshStandardMaterial({color:0xffff00});
-    let obs = new THREE.Mesh(obsGeometry, obsMaterial);
-    obs.position.z = -50;
-    obs.position.x = (Math.random()-0.5)*3;
-    scene.add(obs);
-    obstacles.push(obs);
+function nextPage(type){
+  document.getElementById("page1").style.display="none";
+  document.getElementById("page2").style.display="block";
+  document.getElementById("typeTitle").innerText = type + " Generator";
 }
 
-// Coins
-let coins = [];
-function spawnCoin() {
-    let coinGeo = new THREE.CylinderGeometry(0.3,0.3,0.1,20);
-    let coinMat = new THREE.MeshStandardMaterial({color:0xffd700});
-    let coin = new THREE.Mesh(coinGeo, coinMat);
-    coin.rotation.x = Math.PI/2;
-    coin.position.z = -50;
-    coin.position.x = (Math.random()-0.5)*3;
-    scene.add(coin);
-    coins.push(coin);
+function generateCode(){
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  currentCode="";
+  for(let i=0;i<6;i++){
+    currentCode += chars.charAt(Math.floor(Math.random()*chars.length));
+  }
+  document.getElementById("generatedCode").innerText = "Code: " + currentCode;
+  document.getElementById("copyBtn").classList.remove("hidden");
+  document.getElementById("goNext").classList.remove("hidden");
 }
 
-let speed = 0;
-let maxSpeed = 0.5;
-let boost = false;
-let collectedCoins = 0;
-
-// Camera
-camera.position.y = 5;
-camera.position.z = 5;
-camera.lookAt(cart.position);
-
-// Controls
-let moveLeft = false;
-let moveRight = false;
-document.getElementById("left").addEventListener("touchstart",()=>{moveLeft=true;});
-document.getElementById("left").addEventListener("touchend",()=>{moveLeft=false;});
-document.getElementById("right").addEventListener("touchstart",()=>{moveRight=true;});
-document.getElementById("right").addEventListener("touchend",()=>{moveRight=false;});
-document.getElementById("boost").addEventListener("touchstart",()=>{boost=true;});
-document.getElementById("boost").addEventListener("touchend",()=>{boost=false;});
-
-// Game Loop
-function animate(){
-    requestAnimationFrame(animate);
-
-    speed += (boost?0.02:0.005);
-    speed = Math.min(speed,maxSpeed + (boost?0.5:0));
-
-    // Move cart
-    if(moveLeft) cart.position.x -= 0.1;
-    if(moveRight) cart.position.x += 0.1;
-    cart.position.x = Math.max(-1.5, Math.min(1.5, cart.position.x));
-
-    // Move obstacles
-    obstacles.forEach((o,i)=>{
-        o.position.z += speed*10;
-        if(o.position.z > 5){
-            scene.remove(o);
-            obstacles.splice(i,1);
-        }
-        // Collision
-        if(Math.abs(o.position.z-cart.position.z)<1 && Math.abs(o.position.x-cart.position.x)<0.8){
-            alert("Game Over! Coins: "+collectedCoins);
-            document.location.reload();
-        }
-    });
-
-    // Move coins
-    coins.forEach((c,i)=>{
-        c.position.z += speed*10;
-        c.rotation.z += 0.1;
-        if(c.position.z>5){
-            scene.remove(c);
-            coins.splice(i,1);
-        }
-        // Collect coin
-        if(Math.abs(c.position.z-cart.position.z)<1 && Math.abs(c.position.x-cart.position.x)<0.8){
-            collectedCoins++;
-            document.getElementById("coins").innerText = collectedCoins;
-            scene.remove(c);
-            coins.splice(i,1);
-        }
-    });
-
-    // Spawn obstacles & coins randomly
-    if(Math.random()<0.02) spawnObstacle();
-    if(Math.random()<0.02) spawnCoin();
-
-    document.getElementById("speed").innerText = Math.floor(speed*100);
-
-    renderer.render(scene,camera);
+function copyCode(){
+  navigator.clipboard.writeText(currentCode);
+  alert("Code copied!");
 }
-animate();
+
+function showVerify(){
+  document.getElementById("page2").style.display="none";
+  document.getElementById("page3").style.display="block";
+}
+
+function verifyCode(){
+  const input = document.getElementById("verifyInput").value;
+  if(input === currentCode){
+    document.getElementById("result").innerHTML = "✅ <span class='success'>Send Successful</span>";
+  } else {
+    document.getElementById("result").innerHTML = "❌ Wrong Code";
+  }
+}
 </script>
+
 </body>
 </html>
